@@ -1,12 +1,25 @@
-let RunSentimentAnalysis = ()=>{
-    textToAnalyze = document.getElementById("textToAnalyze").value;
+const RunSentimentAnalysis = () => {
+    // Get the text to analyze from the input field
+    const textToAnalyze = document.getElementById("textToAnalyze").value;
 
-    let xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("system_response").innerHTML = xhttp.responseText;
-        }
-    };
-    xhttp.open("GET", "emotionDetector?textToAnalyze"+"="+textToAnalyze, true);
-    xhttp.send();
-}
+    // Ensure the input is encoded correctly for a URL
+    const encodedText = encodeURIComponent(textToAnalyze);
+
+    // Use fetch API for the request
+    fetch(`emotionDetector?textToAnalyze=${encodedText}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json(); // Assuming the server responds with JSON
+        })
+        .then(data => {
+            // Update the UI with the response data
+            document.getElementById("system_response").innerHTML = JSON.stringify(data, null, 2); // Pretty print the JSON
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+            document.getElementById("system_response").innerHTML = `Error: ${error.message}`;
+        });
+};
+
